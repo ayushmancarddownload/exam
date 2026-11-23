@@ -3,6 +3,9 @@
 Static site for GitHub Pages. Free tests for every registered user, paid tests unlocked by a 30 day pass
 that you activate manually after a UPI payment.
 
+## 0. Node version
+Node **22** chahiye (`node -v` se check karo). Purane Node par build error aata hai. Easy tarika: `./setup.sh` chalao, wo check karke sab setup kar deta hai.
+
 ## 1. Supabase
 1. Create a project at supabase.com.
 2. SQL Editor > paste `supabase-setup.sql` > Run. This creates the tables, the signup trigger, the RLS policies and 12 seed tests.
