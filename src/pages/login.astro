@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Login or Sign Up">
+  <main class="mx-auto max-w-md px-4 py-10">
+    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="grid grid-cols-2 rounded-xl bg-slate-100 p-1 text-sm font-semibold" role="tablist">
+        <button id="tab-login" type="button" role="tab" class="rounded-lg px-3 py-2">Login</button>
+        <button id="tab-signup" type="button" role="tab" class="rounded-lg px-3 py-2">Sign Up</button>
+      </div>
+
+      <div id="alert" class="mt-4 hidden rounded-lg px-3 py-2 text-sm" role="alert"></div>
+
+      <form id="form" class="mt-5 space-y-4" novalidate>
+        <label class="block text-sm font-medium text-slate-700">Email
+          <input id="email" type="email" required autocomplete="email" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+        </label>
+        <label class="block text-sm font-medium text-slate-700">Password
+          <input id="password" type="password" required minlength="6" autocomplete="current-password" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+        </label>
+        <label id="confirm-wrap" class="hidden block text-sm font-medium text-slate-700">Confirm password
+          <input id="confirm" type="password" minlength="6" autocomplete="new-password" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+        </label>
+        <button id="submit" type="submit" class="w-full rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"></button>
+      </form>
+    </div>
+  </main>
+</Base>
+
+<script>
+  import { supabase, configured } from '../lib/supabase.js';
+  import { u } from '../lib/url.js';
+
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  let mode = params.get('tab') === 'signup' ? 'signup' : 'login';
+  const rawNext = params.get('next') || '';
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : u('/dashboard/');
+
+  function alertBox(msg, ok) {
+    const a = $('alert');
+    a.textContent = msg;
+    a.className = 'mt-4 rounded-lg px-3 py-2 text-sm ' + (ok ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-700');
+  }
+  function setMode(m) {
+    mode = m;
+    const on = 'bg-white text-indigo-700 shadow-sm', off = 'text-slate-500';
+    $('tab-login').className = 'rounded-lg px-3 py-2 ' + (m === 'login' ? on : off);
+    $('tab-signup').className = 'rounded-lg px-3 py-2 ' + (m === 'signup' ? on : off);
+    $('confirm-wrap').classList.toggle('hidden', m !== 'signup');
+    $('confirm').required = m === 'signup';
+    $('password').autocomplete = m === 'signup' ? 'new-password' : 'current-password';
+    $('submit').textContent = m === 'signup' ? 'Create free account' : 'Login';
+    $('alert').className = 'mt-4 hidden';
+  }
+
+  $('tab-login').addEventListener('click', () => setMode('login'));
+  $('tab-signup').addEventListener('click', () => setMode('signup'));
+  setMode(mode);
+
+  if (!configured) {
+    alertBox('Supabase is not configured. Copy .env.example to .env and add your project URL and anon key.', false);
+    $('submit').disabled = true;
+  } else {
+    supabase.auth.getSession().then(({ data }) => { if (data.session) location.replace(next); });
+  }
+
+  $('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!configured) return;
+    const email = $('email').value.trim(), password = $('password').value;
+    if (!email || !email.includes('@')) return alertBox('Please enter a valid email address.', false);
+    if (password.length < 6) return alertBox('Password must be at least 6 characters.', false);
+    if (mode === 'signup' && password !== $('confirm').value) return alertBox('Passwords do not match.', false);
+
+    $('submit').disabled = true;
+    const old = $('submit').textContent;
+    $('submit').textContent = 'Please wait...';
+    try {
+      if (mode === 'login') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        location.href = next;
+      } else {
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + u('/dashboard/') } });
+        if (error) throw error;
+        if (data.session) location.href = next;
+        else alertBox('Account created. Check your email and click the confirmation link, then log in.', true);
+      }
+    } catch (err) {
+      alertBox(err.message || 'Something went wrong. Please try again.', false);
+    } finally {
+      $('submit').disabled = false;
+      $('submit').textContent = old;
+    }
+  });
+</script>

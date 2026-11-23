@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+import { PLAN_PRICE, PLAN_DAYS } from '../lib/config.js';
+import { u } from '../lib/url.js';
+const features = [
+  ['Real exam interface', 'Countdown timer, question palette and mark for review, just like the actual test.'],
+  ['Instant results', 'Score, accuracy and time taken the moment you submit.'],
+  ['Explanations for every question', 'See the correct answer and learn why, question by question.'],
+  ['Track your progress', 'Every attempt is saved so you can watch your scores improve.'],
+];
+const faq = [
+  ['Is it really free?', 'Yes. Create an account and attempt all free tests at no cost, as many times as you like.'],
+  ['What do I get for ₹' + PLAN_PRICE + '?', `A ${PLAN_DAYS} day pass that unlocks every test, including the Pro ones.`],
+  ['How do I pay?', 'Pay by UPI, send the screenshot on WhatsApp and your account is activated within 10 to 15 minutes.'],
+  ['What happens after 30 days?', 'Pro tests lock again automatically. Free tests and your history stay available.'],
+];
+---
+<Base title="Online Mock Tests">
+  <section class="bg-gradient-to-b from-indigo-50 to-slate-50">
+    <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
+      <div>
+        <span class="inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">Mock tests for exam preparation</span>
+        <h1 class="mt-4 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">10 Free Mock Tests + All Tests at ₹{PLAN_PRICE}/month</h1>
+        <p class="mt-4 max-w-xl text-lg text-slate-600">Practise under real exam conditions, get instant results with explanations, and unlock every test for less than the price of a cup of chai.</p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href={u('/login/?tab=signup')} class="rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow hover:bg-indigo-700">Start Free</a>
+          <a href={u('/login/')} class="rounded-xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700 hover:bg-slate-50">Login</a>
+        </div>
+        <p class="mt-4 text-sm text-slate-500">No card needed. Free account in 30 seconds.</p>
+      </div>
+
+      <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl" aria-label="Sample test preview">
+        <div class="flex items-center justify-between text-sm">
+          <span class="font-semibold text-slate-700">Question 3 of 5</span>
+          <span class="rounded-full bg-rose-50 px-3 py-1 font-semibold tabular-nums text-rose-600">08:42</span>
+        </div>
+        <p class="mt-4 text-lg font-semibold text-slate-900">What is the simple interest on ₹5000 at 8% per annum for 3 years?</p>
+        <div class="mt-4 space-y-2.5 text-sm">
+          <div class="rounded-xl border border-slate-200 px-4 py-3">A. ₹1000</div>
+          <div class="rounded-xl border-2 border-indigo-500 bg-indigo-50 px-4 py-3 font-medium text-indigo-900">B. ₹1200</div>
+          <div class="rounded-xl border border-slate-200 px-4 py-3">C. ₹1400</div>
+          <div class="rounded-xl border border-slate-200 px-4 py-3">D. ₹1500</div>
+        </div>
+        <div class="mt-4 flex gap-1.5" aria-hidden="true">
+          <span class="h-8 w-8 rounded-lg bg-emerald-100"></span><span class="h-8 w-8 rounded-lg bg-emerald-100"></span><span class="h-8 w-8 rounded-lg ring-2 ring-indigo-500"></span><span class="h-8 w-8 rounded-lg bg-slate-100"></span><span class="h-8 w-8 rounded-lg bg-slate-100"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 py-14">
+    <h2 class="text-center text-2xl font-bold text-slate-900 sm:text-3xl">Everything you need to practise</h2>
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {features.map(([t, d]) => (
+        <div class="rounded-2xl border border-slate-200 bg-white p-5">
+          <h3 class="font-semibold text-slate-900">{t}</h3>
+          <p class="mt-2 text-sm text-slate-600">{d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-4xl px-4 pb-14">
+    <h2 class="text-center text-2xl font-bold text-slate-900 sm:text-3xl">Simple pricing</h2>
+    <div class="mt-8 grid gap-4 md:grid-cols-2">
+      <div class="rounded-2xl border border-slate-200 bg-white p-6">
+        <h3 class="font-semibold text-slate-900">Free</h3>
+        <p class="mt-2 text-4xl font-extrabold text-slate-900">₹0</p>
+        <ul class="mt-4 space-y-2 text-sm text-slate-600"><li>10 free mock tests</li><li>Instant results and explanations</li><li>Attempt history</li></ul>
+        <a href={u('/login/?tab=signup')} class="mt-6 block rounded-xl border border-slate-300 px-4 py-2.5 text-center font-semibold text-slate-700 hover:bg-slate-50">Start Free</a>
+      </div>
+      <div class="rounded-2xl border-2 border-indigo-500 bg-white p-6 shadow-lg">
+        <h3 class="font-semibold text-indigo-700">Pro</h3>
+        <p class="mt-2 text-4xl font-extrabold text-slate-900">₹{PLAN_PRICE}<span class="text-base font-medium text-slate-500"> / {PLAN_DAYS} days</span></p>
+        <ul class="mt-4 space-y-2 text-sm text-slate-600"><li>Every test unlocked</li><li>Everything in Free</li><li>Activated within 10 to 15 minutes</li></ul>
+        <button type="button" data-open-pay class="mt-6 w-full rounded-xl bg-indigo-600 px-4 py-2.5 font-semibold text-white hover:bg-indigo-700">Upgrade to Pro</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pb-14">
+    <h2 class="text-center text-2xl font-bold text-slate-900">Questions</h2>
+    <div class="mt-6 space-y-3">
+      {faq.map(([q, a]) => (
+        <details class="rounded-xl border border-slate-200 bg-white p-4"><summary class="cursor-pointer font-medium text-slate-900">{q}</summary><p class="mt-2 text-sm text-slate-600">{a}</p></details>
+      ))}
+    </div>
+  </section>
+</Base>
